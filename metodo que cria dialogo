@@ -1,0 +1,85 @@
+//função para criar o dialogo
+
+cria_dialogo = function(_dialogo)
+{
+	draw_set_font(fnt_dialogo);
+
+	var _larg_gui = display_get_gui_width();
+	var _alt_gui = display_get_gui_height();
+	
+	var _retrato = _dialogo.retrato[pag];
+	
+	var _altura_caixa = 200;
+	
+	var x1 = 0;
+	var y1 = _alt_gui - _altura_caixa;
+	var escala_x = _larg_gui / sprite_get_width(spr_caixa_dialogo);
+	var escala_y = (_alt_gui - y1) / sprite_get_height(spr_caixa_dialogo);
+		
+	var _texto_completo = _dialogo.texto[pag];
+	var _tam_txt_completo = string_length(_texto_completo);
+	var _txt_igual_txtcompleto = round(i) == _tam_txt_completo;
+	var _space = keyboard_check_pressed(vk_space); 
+	var _array_tam_pag = array_length(_dialogo.texto) - 1;
+	var _pag_nao_limite = pag &lt; _array_tam_pag;
+	var _txt_vel = _dialogo.txt_vel;
+	var _txt = string_copy(_texto_completo, 0, round(i));
+	
+	var _escala_retrato = ((_alt_gui - y1) * 0.7) / sprite_get_height(_retrato);
+	var margem_y = string_height("|");
+	var margem_x = (sprite_get_width(_retrato) * _escala_retrato) + ((sprite_get_height(_retrato) * _escala_retrato) / 6) * 2;
+	
+	var _linha_alt = margem_y;
+	var _linha_larg = _larg_gui - (margem_x + margem_y);
+	
+	var x_retrato = x1 + ((sprite_get_height(_retrato) * _escala_retrato) / 6);
+	var y_retrato = y1 + ((sprite_get_height(_retrato) * _escala_retrato) / 6);
+	
+	
+	//desenhando a caixa de dialogo
+	
+	draw_sprite_ext(spr_caixa_dialogo, 0, x1, y1, escala_x, escala_y, 0, -1, 1);
+	
+	//pegando texto, um caractere por vez
+	
+	if (i &lt; string_length(_texto_completo))
+	{
+		i += _txt_vel;
+	}
+	
+	//se eu apertar espaço deixo o texto completo instantaneamente 
+	
+	if (_space and !_txt_igual_txtcompleto) i = _tam_txt_completo;
+	
+	//se o texto estiver completo e minha pag não estiver no limite
+	
+	if (_txt_igual_txtcompleto and _pag_nao_limite and _space) 
+	{
+		pag++;
+		i = 0;
+	}
+	
+	//apos finalizar todos os dialogos, ao apertar espaço eu volto pro estado parado e destruo o obj_dialogo
+	
+	if (_space and !_pag_nao_limite and _txt_igual_txtcompleto)
+	{
+		if (player)
+		{
+			with(player)
+			{
+				estado = estado_parado;
+			}
+		}
+		instance_destroy();
+	}
+	
+	//desenhando o retrato
+	
+	draw_sprite_ext(_retrato, 0, x_retrato, y_retrato + 2 * escala_y, _escala_retrato, _escala_retrato, 0, -1, 1);
+	
+	//desenhando o texto
+
+	draw_text_ext_transformed(x1 + margem_x, y1 + margem_y, _txt, _linha_alt, _linha_larg, 1, 1, 0);
+
+	draw_set_font(-1);	
+}
